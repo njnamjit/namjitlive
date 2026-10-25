@@ -9,18 +9,19 @@ body.public-page{background:#cfe4fb;font-family:"Kanit",system-ui,sans-serif}
 .poster-inner:after{right:3cqw;bottom:2.6cqw;width:22cqw;height:12cqw;border-left:0;border-top:0}
 .poster-head,.col-heads,.rows,.state-card,.poster-foot{position:relative;z-index:1}
 
-.poster-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:2.5cqw;margin-bottom:4.5cqw}
+.poster-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:2cqw;margin-bottom:4.5cqw}
 .brands{display:flex;align-items:center;gap:1.2cqw}
-.brands .logo{width:clamp(46px,7cqw,84px);height:auto;border-radius:50%}
-.brands .live{width:clamp(84px,11.5cqw,140px);height:auto}
-.date-pill{justify-self:center;text-align:center;background:#1f5fe6;color:#fff;font-weight:600;font-size:clamp(14px,3cqw,32px);padding:1.3cqw 3cqw;white-space:nowrap;border-radius:2.4cqw;box-shadow:0 .5cqw 1.4cqw #0d3b9a40;line-height:1.3}
-.ribbon{margin-right:-7cqw;padding:1.4cqw 2.6cqw 1.6cqw 5.5cqw;background:#fbb03b;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,6% 50%)}
-.ribbon span{display:block;white-space:nowrap;font-family:"Mali","Kanit",sans-serif;font-weight:700;font-size:clamp(20px,5cqw,56px);line-height:1.15;color:#f15a29;text-shadow:0 0 .35cqw #fff,.25cqw .25cqw 0 #fff,-.2cqw -.2cqw 0 #fff}
+.brands .logo{width:clamp(46px,6.2cqw,76px);height:auto;border-radius:50%}
+.brands .live{width:clamp(84px,10cqw,124px);height:auto}
+.date-pill{justify-self:center;text-align:center;background:#1f5fe6;color:#fff;font-weight:600;font-size:clamp(14px,2.4cqw,28px);padding:1.2cqw 2.4cqw;white-space:normal;border-radius:2.4cqw;box-shadow:0 .5cqw 1.4cqw #0d3b9a40;line-height:1.3}
+.ribbon{margin-right:-7cqw;padding:1.3cqw 9.2cqw 1.5cqw 4.5cqw;background:#fbb03b;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,6% 50%)}
+.ribbon span{display:block;white-space:nowrap;font-family:"Mali","Kanit",sans-serif;font-weight:700;font-size:clamp(20px,4cqw,46px);line-height:1.15;color:#f15a29;text-shadow:0 0 .35cqw #fff,.25cqw .25cqw 0 #fff,-.2cqw -.2cqw 0 #fff}
 @container (max-width:640px){
   .poster-head{grid-template-columns:1fr auto}
   .date-pill{grid-column:1/-1;grid-row:2;justify-self:stretch;white-space:normal}
-  .ribbon span{font-size:clamp(20px,7cqw,40px)}
-  .date-pill{font-size:clamp(14px,4.2cqw,24px)}
+  .ribbon span{font-size:clamp(18px,6cqw,36px)}
+  .ribbon{padding-left:5cqw}
+  .date-pill{font-size:clamp(14px,4.2cqw,24px);white-space:normal}
 }
 
 .col-heads{display:grid;grid-template-columns:var(--tabw) var(--timew) 1fr;gap:var(--gap);margin-bottom:1.6cqw;font-family:"Mali","Kanit",sans-serif;font-weight:700;color:#fff;font-size:clamp(12px,3cqw,30px)}
