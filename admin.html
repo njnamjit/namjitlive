@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#6d5dfc">
+  <title>จัดการตารางไลฟ์ | NJ NAMJIT</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-page">
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">NJ</span><span><strong>NJ NAMJIT</strong><small>LIVE SCHEDULE</small></span>
+    </a>
+    <div class="header-actions"><a class="button button-light header-link" href="index.html" target="_blank" rel="noopener">↗ ดูหน้าตาราง</a><button type="button" class="button button-light header-link" id="logout-button" hidden>ออกจากระบบ</button></div>
+  </header>
+
+  <main class="admin-wrap">
+    <section class="admin-heading">
+      <div><span class="eyebrow">CONTROL CENTER</span><h1>จัดการตารางไลฟ์</h1><p>จัดตารางประจำสัปดาห์และแก้ไขรายการไลฟ์ได้จากที่เดียว</p></div>
+      <div class="admin-status"><span class="status-dot"></span> <span id="save-status">พร้อมจัดการ</span></div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <section id="login-view" class="admin-panel login-panel" hidden>
+      <div class="panel-heading"><div class="panel-icon">🔒</div><div><h2>เข้าสู่ระบบแอดมิน</h2><p>ใส่รหัสผ่านเพื่อจัดการตารางไลฟ์</p></div></div>
+      <form id="login-form">
+        <label>รหัสผ่าน<input type="password" id="password" autocomplete="current-password" required autofocus></label>
+        <div class="form-actions"><button type="submit" class="button button-primary" id="login-button">เข้าสู่ระบบ</button></div>
+      </form>
+    </section>
+
+    <div id="dashboard" hidden>
+
+    <section class="admin-panel">
+      <div class="panel-heading"><div class="panel-icon">▦</div><div><h2>ข้อมูลประจำสัปดาห์</h2><p>ข้อมูลนี้จะแสดงบนหน้าตารางไลฟ์</p></div></div>
+      <div class="week-form">
+        <label>สัปดาห์ที่<input type="number" id="week" min="1" step="1" placeholder="เช่น 12"></label>
+        <label>วันเริ่มต้น<input type="date" id="start-date"></label>
+        <label>วันสิ้นสุด<input type="date" id="end-date"></label>
+      </div>
+      <div class="form-actions"><button type="button" class="button button-light" id="next-week">⟳ เริ่มสัปดาห์ถัดไป</button><span class="form-hint">เลื่อนสัปดาห์และวันที่ไป 7 วัน โดยคงรายการเดิมไว้ให้แก้ต่อ</span></div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="panel-heading"><div class="panel-icon">✦</div><div><h2 id="form-heading">เพิ่มรายการไลฟ์</h2><p>กรอกรายละเอียดให้ครบ แล้วกดเพิ่มรายการ</p></div></div>
+      <form id="schedule-form">
+        <div class="form-grid">
+          <label>วันไลฟ์<select id="day" required>
+            <option value="จันทร์">วันจันทร์</option><option value="อังคาร">วันอังคาร</option><option value="พุธ">วันพุธ</option><option value="พฤหัสบดี">วันพฤหัสบดี</option><option value="ศุกร์">วันศุกร์</option><option value="เสาร์">วันเสาร์</option><option value="อาทิตย์">วันอาทิตย์</option>
+          </select></label>
+          <label>เวลา<input type="time" id="time" required></label>
+          <label class="span-2">รายละเอียดไลฟ์<input type="text" id="details" maxlength="160" placeholder="เช่น เล่นเกม / พูดคุยกับทุกคน" required></label>
+          <label class="span-2">ประเภทไลฟ์ (ไม่บังคับ)<input type="text" id="type" list="recent-types" maxlength="80" placeholder="เช่น Gaming, Talk"></label>
+          <datalist id="recent-types"></datalist>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="button button-primary" id="submit-button">＋ เพิ่มรายการ</button>
+          <button type="button" class="button button-secondary" id="cancel-edit" hidden>ยกเลิกแก้ไข</button>
+          <span class="form-hint">เพิ่มแล้วอย่าลืมกด “บันทึกการเปลี่ยนแปลง”</span>
+        </div>
+      </form>
+    </section>
+
+    <section class="admin-panel">
+      <div class="list-heading">
+        <div class="panel-heading no-margin"><div class="panel-icon">☷</div><div><h2>รายการไลฟ์ทั้งหมด</h2><p>ตรวจสอบ แก้ไข หรือลบรายการที่มีอยู่</p></div></div>
+        <span class="count-badge"><strong id="item-count">0</strong> รายการ</span>
+      </div>
+      <div id="admin-empty" class="admin-empty"><span>✧</span><h3>ยังไม่มีรายการไลฟ์</h3><p>ใช้แบบฟอร์มด้านบนเพื่อเพิ่มรายการแรกของคุณ</p></div>
+      <div class="table-scroll" id="table-wrap" hidden>
+        <table class="admin-table">
+          <thead><tr><th>วัน / เวลา</th><th>รายละเอียด</th><th>ประเภท</th><th>จัดการ</th></tr></thead>
+          <tbody id="schedule-list"></tbody>
+        </table>
+      </div>
+      <div class="save-bar">
+        <p>เมื่อแก้ไขเสร็จ ให้บันทึกเพื่ออัปเดตหน้าตารางสาธารณะ</p>
+        <button type="button" class="button button-primary save-button" id="save-button">บันทึกการเปลี่ยนแปลง <span>→</span></button>
+      </div>
+      <p class="form-hint shortcut-hint">ทางลัด: กด Ctrl + S (Mac: ⌘ + S) เพื่อบันทึกได้ทันที</p>
+    </section>
+    <p class="admin-footnote">ข้อมูลทั้งหมดถูกเก็บใน Google Sheet และแก้ไขได้ที่นั่นโดยตรงด้วย</p>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="admin-script.js"></script>
+</body>
+</html>

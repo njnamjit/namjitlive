@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2a7cf6">
+  <title>ตารางไลฟ์ | NJ NAMJIT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Mali:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="public.css">
+</head>
+<body class="public-page">
+  <main class="poster-wrap">
+    <div class="poster">
+      <div class="poster-inner">
+        <header class="poster-head">
+          <div class="brands">
+            <img class="logo" src="assets/logo.png" alt="NAMJIT">
+            <img class="live" src="assets/live.png" alt="LIVE NJ Streaming">
+          </div>
+          <div class="date-pill" id="date-pill">ตารางประจำสัปดาห์</div>
+          <div class="ribbon"><span>ตารางไลฟ์</span></div>
+        </header>
+
+        <div class="col-heads" aria-hidden="true"><span>วัน</span><span>เวลา</span><span>รายละเอียด</span></div>
+
+        <div id="loading-state" class="state-card"><span class="loader"></span><p>กำลังโหลดตาราง...</p></div>
+        <div id="error-state" class="state-card error-state" hidden>
+          <div class="state-icon">!</div><h3>โหลดตารางไม่สำเร็จ</h3>
+          <p>กรุณาลองใหม่อีกครั้ง หากยังไม่หาย แจ้งแอดมินให้ตรวจสอบการเชื่อมต่อ Google Sheet</p>
+          <button class="button button-secondary" id="retry-button">ลองอีกครั้ง</button>
+        </div>
+        <div class="rows" id="rows" role="list"></div>
+        <p class="poster-foot">ขอบคุณที่แวะมารับชม แล้วเจอกันในไลฟ์นะ 💜</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script>
+    const DAYS = [
+      {name:'จันทร์',short:'จ.',color:'#fbb03b'}, {name:'อังคาร',short:'อ.',color:'#ff7eb3'},
+      {name:'พุธ',short:'พ.',color:'#3ab54a'}, {name:'พฤหัสบดี',short:'พฤ.',color:'#f15a29'},
+      {name:'ศุกร์',short:'ศ.',color:'#27aae1'}, {name:'เสาร์',short:'ส.',color:'#662d91'},
+      {name:'อาทิตย์',short:'อา.',color:'#ed1c24'}
+    ];
+    const MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    const thaiToday = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'][new Date().getDay()];
+    const rowsEl = document.getElementById('rows');
+    const loading = document.getElementById('loading-state');
+    const error = document.getElementById('error-state');
+
+    function parseDMY(s) { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s || ''); return m ? {d:+m[1], m:+m[2]-1, y:+m[3]} : null; }
+    function rangeText(a, b) {
+      const s = parseDMY(a), e = parseDMY(b);
+      if (s && e) {
+        if (s.y === e.y && s.m === e.m) return `${s.d}-${e.d} ${MONTHS[e.m]} ${e.y}`;
+        return `${s.d} ${MONTHS[s.m]}${s.y !== e.y ? ' ' + s.y : ''} - ${e.d} ${MONTHS[e.m]} ${e.y}`;
+      }
+      const one = s || e;
+      return one ? `${one.d} ${MONTHS[one.m]} ${one.y}` : 'ตารางประจำสัปดาห์';
+    }
+    function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+
+    function render(data) {
+      const items = Array.isArray(data.schedule) ? data.schedule : [];
+      document.getElementById('date-pill').textContent = rangeText(data.start_date, data.end_date);
+      loading.hidden = true; error.hidden = true;
+      rowsEl.replaceChildren(...DAYS.map(day => {
+        const list = items.filter(i => i.day === day.name).sort((a, b) => String(a.time).localeCompare(String(b.time)));
+        const row = el('div', 'day-row' + (day.name === thaiToday ? ' is-today' : ''));
+        row.setAttribute('role', 'listitem');
+        row.style.setProperty('--tab', day.color);
+        const tab = el('div', 'day-tab', day.short);
+        tab.title = 'วัน' + day.name;
+        const box = el('div', 'day-items');
+        (list.length ? list : [null]).forEach(it => {
+          const line = el('div', 'item');
+          line.append(el('div', 'cell-time', it ? String(it.time).replace(':', '.') : '-'));
+          const d = el('div', 'cell-detail');
+          d.append(el('span', null, it ? it.details : '-'));
+          if (it && it.type) d.append(el('small', 'type-tag', it.type));
+          line.append(d);
+          box.append(line);
+        });
+        row.append(tab, box);
+        return row;
+      }));
+    }
+
+    async function loadSchedule() {
+      loading.hidden = false; error.hidden = true; rowsEl.replaceChildren();
+      try {
+        const response = await fetch(`${window.APP_CONFIG.API_URL}?v=${Date.now()}`);
+        if (!response.ok) throw new Error('Request failed');
+        const data = await response.json();
+        if (data.success === false) throw new Error(data.message);
+        render(data);
+      } catch (e) {
+        loading.hidden = true; error.hidden = false;
+        document.getElementById('date-pill').textContent = 'โหลดตารางไม่ได้';
+      }
+    }
+    document.getElementById('retry-button').addEventListener('click', loadSchedule);
+    loadSchedule();
+  </script>
+</body>
+</html>
