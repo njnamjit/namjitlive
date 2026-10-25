@@ -51,7 +51,7 @@ const cur = () => weeks.find(w => w.id === curId);
 const byStart = (a, b) => (a.start || '9999').localeCompare(b.start || '9999');
 const newId = () => (Math.random().toString(36) + '00000000').slice(2, 10);
 const toLocal = w => ({id:w.id, week:Number(w.week) || 1, start:toInputDate(w.start_date), end:toInputDate(w.end_date), schedule:(w.schedule || []).map(i => ({...i}))});
-const toServer = w => ({id:w.id, week:w.week, start_date:displayDate(w.start), end_date:displayDate(w.end), schedule:w.schedule});
+const toServer = w => ({id:String(w.id || ''), week:Number(w.week), start_date:displayDate(w.start), end_date:displayDate(w.end), schedule:Array.isArray(w.schedule) ? w.schedule : []});
 
 function weekLabel(w) {
   const s = displayDate(w.start), e = displayDate(w.end), t0 = todayISO();
@@ -97,7 +97,7 @@ $('del-week').addEventListener('click', () => {
   setStatus('มีการเปลี่ยนแปลงที่ยังไม่บันทึก'); showToast('ลบสัปดาห์แล้ว อย่าลืมบันทึกการเปลี่ยนแปลง');
 });
 $('week-select').addEventListener('change', e => selectWeek(e.target.value));
-$('week').addEventListener('input', () => { cur().week = parseInt($('week').value, 10) || 0; markDirty(); });
+$('week').addEventListener('input', () => { const raw = $('week').value.trim(); cur().week = raw === '' ? '' : Number(raw); markDirty(); });
 $('start-date').addEventListener('change', () => {
   const w = cur(); w.start = $('start-date').value;
   if (w.start && (!w.end || w.end < w.start)) { w.end = shiftDate(w.start, 6); $('end-date').value = w.end; }
@@ -211,7 +211,8 @@ async function saveAll() {
   if (!isDirty()) { showToast('ยังไม่มีการเปลี่ยนแปลงให้บันทึก'); return; }
   for (const id of dirtyIds) {
     const w = weeks.find(x => x.id === id); if (!w) continue;
-    const problem = !(w.week >= 1) ? 'กรุณาระบุหมายเลขสัปดาห์ตั้งแต่ 1 ขึ้นไป'
+    const weekNo = Number(w.week);
+    const problem = (!Number.isInteger(weekNo) || weekNo < 1) ? 'กรุณาระบุหมายเลขสัปดาห์เป็นจำนวนเต็มตั้งแต่ 1 ขึ้นไป' 
       : (!w.start || !w.end) ? 'กรุณาระบุวันเริ่มต้นและวันสิ้นสุด'
       : w.start > w.end ? 'วันเริ่มต้นต้องไม่อยู่หลังวันสิ้นสุด' : '';
     if (problem) { selectWeek(id); showToast(`${problem} (สัปดาห์ที่ ${w.week || '?'})`, 'error'); return; }
@@ -226,7 +227,7 @@ async function saveAll() {
     renderWeekSelect(); setStatus('บันทึกแล้ว'); showToast('บันทึกตารางเรียบร้อยแล้ว');
   } catch (err) {
     setStatus('บันทึกไม่สำเร็จ');
-    if (token) showToast(netMsg(err.message) || 'เกิดข้อผิดพลาดในการบันทึก', 'error');
+    showToast(netMsg(err.message) || 'เกิดข้อผิดพลาดในการบันทึก', 'error');
   } finally { btn.disabled = false; btn.innerHTML = 'บันทึกการเปลี่ยนแปลง <span>→</span>'; }
 }
 $('save-button').addEventListener('click', saveAll);
