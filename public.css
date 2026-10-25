@@ -40,3 +40,10 @@ body.public-page{background:#cfe4fb;font-family:"Kanit",system-ui,sans-serif}
 .poster-foot{margin:3.5cqw 0 0;text-align:center;color:#1d4f9c;font-weight:600;font-size:clamp(11px,1.9cqw,18px)}
 .poster .state-card{min-height:160px;margin-bottom:1.6cqw}
 .poster .state-card[hidden]{display:none!important}
+
+/* กันครอบดำข้อความ / กดค้างบนมือถือ / ลากรูป */
+body.public-page{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+body.public-page ::selection{background:transparent}
+body.public-page img{pointer-events:none;-webkit-user-drag:none;user-select:none}
+.game-img{flex:0 0 auto;height:calc(var(--rh)*.84);width:auto;max-width:34cqw;object-fit:contain}
+@media print{body.public-page{display:none}}

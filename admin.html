@@ -18,7 +18,7 @@
 
   <main class="admin-wrap">
     <section class="admin-heading">
-      <div><span class="eyebrow">CONTROL CENTER</span><h1>จัดการตารางไลฟ์</h1><p>จัดตารางประจำสัปดาห์และแก้ไขรายการไลฟ์ได้จากที่เดียว</p></div>
+      <div><span class="eyebrow">CONTROL CENTER</span><h1>จัดการตารางไลฟ์</h1><p>วางตารางล่วงหน้าได้หลายสัปดาห์ หน้าเว็บจะแสดงสัปดาห์ปัจจุบันให้อัตโนมัติ</p></div>
       <div class="admin-status"><span class="status-dot"></span> <span id="save-status">พร้อมจัดการ</span></div>
     </section>
 
@@ -33,56 +33,72 @@
     </section>
 
     <div id="dashboard" hidden>
-
-    <section class="admin-panel">
-      <div class="panel-heading"><div class="panel-icon">▦</div><div><h2>ข้อมูลประจำสัปดาห์</h2><p>ข้อมูลนี้จะแสดงบนหน้าตารางไลฟ์</p></div></div>
-      <div class="week-form">
-        <label>สัปดาห์ที่<input type="number" id="week" min="1" step="1" placeholder="เช่น 12"></label>
-        <label>วันเริ่มต้น<input type="date" id="start-date"></label>
-        <label>วันสิ้นสุด<input type="date" id="end-date"></label>
-      </div>
-      <div class="form-actions"><button type="button" class="button button-light" id="next-week">⟳ เริ่มสัปดาห์ถัดไป</button><span class="form-hint">เลื่อนสัปดาห์และวันที่ไป 7 วัน โดยคงรายการเดิมไว้ให้แก้ต่อ</span></div>
-    </section>
-
-    <section class="admin-panel">
-      <div class="panel-heading"><div class="panel-icon">✦</div><div><h2 id="form-heading">เพิ่มรายการไลฟ์</h2><p>กรอกรายละเอียดให้ครบ แล้วกดเพิ่มรายการ</p></div></div>
-      <form id="schedule-form">
-        <div class="form-grid">
-          <label>วันไลฟ์<select id="day" required>
-            <option value="จันทร์">วันจันทร์</option><option value="อังคาร">วันอังคาร</option><option value="พุธ">วันพุธ</option><option value="พฤหัสบดี">วันพฤหัสบดี</option><option value="ศุกร์">วันศุกร์</option><option value="เสาร์">วันเสาร์</option><option value="อาทิตย์">วันอาทิตย์</option>
-          </select></label>
-          <label>เวลา<input type="time" id="time" required></label>
-          <label class="span-2">รายละเอียดไลฟ์<input type="text" id="details" maxlength="160" placeholder="เช่น เล่นเกม / พูดคุยกับทุกคน" required></label>
-          <label class="span-2">ประเภทไลฟ์ (ไม่บังคับ)<input type="text" id="type" list="recent-types" maxlength="80" placeholder="เช่น Gaming, Talk"></label>
-          <datalist id="recent-types"></datalist>
+      <section class="admin-panel">
+        <div class="panel-heading"><div class="panel-icon">▦</div><div><h2>สัปดาห์</h2><p>เลือกสัปดาห์ที่จะแก้ไข หรือเพิ่มสัปดาห์ถัดไปเพื่อวางแผนล่วงหน้า</p></div></div>
+        <label>เลือกสัปดาห์<select id="week-select"></select></label>
+        <div class="week-form week-fields">
+          <label>สัปดาห์ที่<input type="number" id="week" min="1" step="1"></label>
+          <label>วันเริ่มต้น<input type="date" id="start-date"></label>
+          <label>วันสิ้นสุด<input type="date" id="end-date"></label>
         </div>
         <div class="form-actions">
-          <button type="submit" class="button button-primary" id="submit-button">＋ เพิ่มรายการ</button>
-          <button type="button" class="button button-secondary" id="cancel-edit" hidden>ยกเลิกแก้ไข</button>
-          <span class="form-hint">เพิ่มแล้วอย่าลืมกด “บันทึกการเปลี่ยนแปลง”</span>
+          <button type="button" class="button button-light" id="add-week">＋ เพิ่มสัปดาห์ถัดไป (ว่าง)</button>
+          <button type="button" class="button button-light" id="copy-week">⧉ เพิ่มพร้อมคัดลอกรายการ</button>
+          <button type="button" class="button button-light danger-text" id="del-week">ลบสัปดาห์นี้</button>
         </div>
-      </form>
-    </section>
+        <p class="form-hint week-hint">สัปดาห์ใหม่จะต่อจากสัปดาห์ล่าสุดโดยเลื่อนวันที่ไป 7 วัน ส่วน “คัดลอกรายการ” จะนำรายการของสัปดาห์ที่เลือกอยู่ไปใส่ให้</p>
+      </section>
 
-    <section class="admin-panel">
-      <div class="list-heading">
-        <div class="panel-heading no-margin"><div class="panel-icon">☷</div><div><h2>รายการไลฟ์ทั้งหมด</h2><p>ตรวจสอบ แก้ไข หรือลบรายการที่มีอยู่</p></div></div>
-        <span class="count-badge"><strong id="item-count">0</strong> รายการ</span>
-      </div>
-      <div id="admin-empty" class="admin-empty"><span>✧</span><h3>ยังไม่มีรายการไลฟ์</h3><p>ใช้แบบฟอร์มด้านบนเพื่อเพิ่มรายการแรกของคุณ</p></div>
-      <div class="table-scroll" id="table-wrap" hidden>
-        <table class="admin-table">
-          <thead><tr><th>วัน / เวลา</th><th>รายละเอียด</th><th>ประเภท</th><th>จัดการ</th></tr></thead>
-          <tbody id="schedule-list"></tbody>
-        </table>
-      </div>
-      <div class="save-bar">
-        <p>เมื่อแก้ไขเสร็จ ให้บันทึกเพื่ออัปเดตหน้าตารางสาธารณะ</p>
-        <button type="button" class="button button-primary save-button" id="save-button">บันทึกการเปลี่ยนแปลง <span>→</span></button>
-      </div>
-      <p class="form-hint shortcut-hint">ทางลัด: กด Ctrl + S (Mac: ⌘ + S) เพื่อบันทึกได้ทันที</p>
-    </section>
-    <p class="admin-footnote">ข้อมูลทั้งหมดถูกเก็บใน Google Sheet และแก้ไขได้ที่นั่นโดยตรงด้วย</p>
+      <section class="admin-panel">
+        <div class="panel-heading"><div class="panel-icon">✦</div><div><h2 id="form-heading">เพิ่มรายการไลฟ์</h2><p>รายการจะเพิ่มในสัปดาห์ที่เลือกด้านบน</p></div></div>
+        <form id="schedule-form">
+          <div class="form-grid">
+            <label>วันไลฟ์<select id="day" required>
+              <option value="จันทร์">วันจันทร์</option><option value="อังคาร">วันอังคาร</option><option value="พุธ">วันพุธ</option><option value="พฤหัสบดี">วันพฤหัสบดี</option><option value="ศุกร์">วันศุกร์</option><option value="เสาร์">วันเสาร์</option><option value="อาทิตย์">วันอาทิตย์</option>
+            </select></label>
+            <label>เวลา<input type="time" id="time" required></label>
+            <label class="span-2">รายละเอียดไลฟ์<input type="text" id="details" maxlength="160" placeholder="เช่น เล่นเกม / พูดคุยกับทุกคน" required></label>
+            <label class="span-2">ประเภทไลฟ์ (ไม่บังคับ)<input type="text" id="type" maxlength="80" placeholder="เช่น Gaming, Talk" list="recent-types"></label>
+            <datalist id="recent-types"></datalist>
+            <div class="span-2 image-field">
+              <span class="field-label">รูปประกอบ (ไม่บังคับ) เช่น รูปปกเกม จะแสดงท้ายรายละเอียด</span>
+              <div class="image-row">
+                <div class="image-preview" id="image-preview">ไม่มีรูป</div>
+                <div class="image-buttons">
+                  <label class="button button-light file-button">เลือกรูป<input type="file" id="image-file" accept="image/*" hidden></label>
+                  <button type="button" class="button button-secondary" id="image-clear" hidden>ลบรูป</button>
+                </div>
+              </div>
+              <span class="form-hint">ระบบย่อรูปให้อัตโนมัติ (รูปที่มีพื้นหลังโปร่งใสแบบ PNG ใช้ได้)</span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="button button-primary" id="submit-button">＋ เพิ่มรายการ</button>
+            <button type="button" class="button button-secondary" id="cancel-edit" hidden>ยกเลิกแก้ไข</button>
+            <span class="form-hint">เพิ่มแล้วอย่าลืมกด “บันทึกการเปลี่ยนแปลง”</span>
+          </div>
+        </form>
+      </section>
+
+      <section class="admin-panel">
+        <div class="list-heading">
+          <div class="panel-heading no-margin"><div class="panel-icon">☷</div><div><h2>รายการไลฟ์ของสัปดาห์นี้</h2><p>ตรวจสอบ แก้ไข คัดลอก หรือลบรายการ</p></div></div>
+          <span class="count-badge"><strong id="item-count">0</strong> รายการ</span>
+        </div>
+        <div id="admin-empty" class="admin-empty"><span>✧</span><h3>สัปดาห์นี้ยังไม่มีรายการไลฟ์</h3><p>ใช้แบบฟอร์มด้านบนเพื่อเพิ่มรายการแรก</p></div>
+        <div class="table-scroll" id="table-wrap" hidden>
+          <table class="admin-table">
+            <thead><tr><th>วัน / เวลา</th><th>รายละเอียด</th><th>ประเภท</th><th>จัดการ</th></tr></thead>
+            <tbody id="schedule-list"></tbody>
+          </table>
+        </div>
+        <div class="save-bar">
+          <p>บันทึกครั้งเดียวได้ทุกสัปดาห์ที่แก้ไข (สัปดาห์ที่ยังไม่บันทึกมีเครื่องหมาย ● ในรายการเลือกสัปดาห์)</p>
+          <button type="button" class="button button-primary save-button" id="save-button">บันทึกการเปลี่ยนแปลง <span>→</span></button>
+        </div>
+        <p class="form-hint shortcut-hint">ทางลัด: กด Ctrl + S (Mac: ⌘ + S) เพื่อบันทึกได้ทันที</p>
+      </section>
+      <p class="admin-footnote">ข้อมูลทั้งหมดถูกเก็บใน Google Sheet และแก้ไขได้ที่นั่นโดยตรงด้วย</p>
     </div>
   </main>
   <script src="config.js"></script>

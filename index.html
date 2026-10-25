@@ -82,6 +82,7 @@
           const d = el('div', 'cell-detail');
           d.append(el('span', null, it ? it.details : '-'));
           if (it && it.type) d.append(el('small', 'type-tag', it.type));
+          if (it && /^data:image\//.test(it.image || '')) { const im = el('img', 'game-img'); im.src = it.image; im.alt = ''; im.draggable = false; d.append(im); }
           line.append(d);
           box.append(line);
         });
@@ -105,6 +106,17 @@
     }
     document.getElementById('retry-button').addEventListener('click', loadSchedule);
     loadSchedule();
+  </script>
+  <script>
+    /* กันคลิกขวา ลาก คัดลอก ครอบดำข้อความ และคีย์ลัดบันทึก/ดูซอร์ส (ป้องกันได้ระดับผู้ใช้ทั่วไป) */
+    (function () {
+      const stop = e => e.preventDefault();
+      ['contextmenu', 'dragstart', 'selectstart', 'copy', 'cut'].forEach(t => document.addEventListener(t, stop));
+      document.addEventListener('keydown', e => {
+        const k = e.key.toLowerCase(), c = e.ctrlKey || e.metaKey;
+        if (e.key === 'F12' || (c && ['s', 'u', 'p', 'a', 'c', 'x'].includes(k)) || (c && e.shiftKey && ['i', 'j', 'c'].includes(k))) e.preventDefault();
+      });
+    })();
   </script>
 </body>
 </html>
